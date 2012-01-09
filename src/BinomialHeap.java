@@ -33,7 +33,7 @@ public class BinomialHeap
 		this.first = node;
 		this.last = node;
 		if (node != null) {
-			this.size = node.getTree().getSize();
+			this.size = node.getSize();
 			treesNum = 1;
 			buildTreeSizes();
 		} else {
