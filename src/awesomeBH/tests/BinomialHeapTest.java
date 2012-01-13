@@ -1,6 +1,9 @@
 package awesomeBH.tests;
 
 import static org.junit.Assert.*;
+
+import java.util.Arrays;
+
 import org.junit.Test;
 
 import awesomeBH.BinomialHeap;
@@ -53,6 +56,17 @@ public class BinomialHeapTest {
 		assertEquals(3, heap.findMin());
 	}
 	
+	@Test public void deleteMinTest4() {
+		BinomialHeap heap = new BinomialHeap();
+		int[] array = { 7,2,5,14,1,30,12,19,24,7,2,5,14,1,30 }; 
+		heap.arrayToHeap(array);
+		assertEquals(1, heap.findMin());
+		heap.deleteMin();
+		assertEquals(1, heap.findMin());
+		heap.deleteMin();
+		assertEquals(2, heap.findMin());
+	}
+	
 	@Test public void findMinTest1() {
 		BinomialHeap heap = new BinomialHeap();
 		
@@ -64,6 +78,20 @@ public class BinomialHeapTest {
 		heap.insert(8);
 		heap.insert(4);
 		heap.insert(10);
+		
+		assertEquals(3, heap.findMin());
+	}
+	
+	@Test public void findMinTest2() {
+		BinomialHeap heap = new BinomialHeap();
+		
+		for (int i=4; i<200; i++) {
+			heap.insert(i);
+		}
+		heap.insert(3);
+		for (int i=201; i<450; i++) {
+			heap.insert(i);
+		}
 		
 		assertEquals(3, heap.findMin());
 	}
@@ -96,7 +124,7 @@ public class BinomialHeapTest {
 		heap.arrayToHeap(array);
 		assertEquals(array.length, heap.size());
 	}
-	
+
 	@Test public void arrayToHeapTest2() {
 		BinomialHeap heap = new BinomialHeap();
 		heap.insert(16);
@@ -105,7 +133,62 @@ public class BinomialHeapTest {
 		assertEquals(true, heap.empty());
 	}
 	
+	@Test public void arrayToHeapTest3() {
+		BinomialHeap heap = new BinomialHeap();
+		heap.insert(1);
+		int[] array = { 7,2,5 }; 
+		heap.arrayToHeap(array);
+		assertEquals(3, heap.size());
+		assertEquals(2, heap.findMin());
+	}
+	
 	//TODO @Test public void treesSizeTest1() {}
 	
-	//TODO @Test public void isValidTest1() {}
+	@Test public void isValidTest1() {
+		BinomialHeap heap = new BinomialHeap();
+		int[] array = { 7,2,5,14,1,30 }; 
+		heap.arrayToHeap(array);
+		assertEquals(true, heap.isValid());
+	}
+	
+	@Test public void isValidTest2() {
+		BinomialHeap heap = new BinomialHeap();
+		int[] array = { 7,2,5,14,1,30,12,19 }; 
+		heap.arrayToHeap(array);
+
+		heap.getLast().setLeftMostChild(heap.getLast().getLeftMostChild().getNext());
+		
+		assertEquals(false, heap.isValid());
+	}
+	
+	@Test public void isValidTest3() {
+		BinomialHeap heap = new BinomialHeap();
+		int[] array = { 7,2,5,14,1,30,12,19,24,7,2,5,14,1,30 }; 
+		heap.arrayToHeap(array);
+		assertEquals(true, heap.isValid());
+		
+		heap.getFirst().getNext().getNext().getLeftMostChild().setNext(null);
+		assertEquals(false, heap.isValid());
+	}
+
+	@Test public void isValidTest4() {
+		BinomialHeap heap = new BinomialHeap();
+		int[] array = { 7,2,5,14,1,30,12,19,24,7,2,5,14,1,30 }; 
+		heap.arrayToHeap(array);
+		assertEquals(true, heap.isValid());
+
+		// kilkul for klal ha arema
+		heap.getLast().setLeftMostChild(heap.getLast().getLeftMostChild().getNext());
+		assertEquals(false, heap.isValid());
+	}
+	
+	@Test public void isValidTest5() {
+		BinomialHeap heap = new BinomialHeap();
+		int[] array = { 7,2,5,14,1,30,12,19,24,7,2,5,14,1,30 }; 
+		heap.arrayToHeap(array);
+		assertEquals(true, heap.isValid());
+		
+		heap.getLast().getLeftMostChild().getLeftMostChild().setLeftMostChild(null);
+		assertEquals(false, heap.isValid());
+	}
 }
