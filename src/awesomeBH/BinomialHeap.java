@@ -8,7 +8,7 @@ package awesomeBH;
 public class BinomialHeap
 {
 	
-	private static int EMPTY_HEAP_SIZE = -1; // TODO: check
+	private static int EMPTY_HEAP_SIZE = 0; // TODO: check
 
 	private HeapNode min;
 	private HeapNode first;
@@ -37,7 +37,7 @@ public class BinomialHeap
 		if (node != null) {
 			this.size = node.getSize();
 			treesNum = 1;
-			buildTreeSizes();
+			buildTreesSize();
 		} else {
 			this.size = EMPTY_HEAP_SIZE;
 			treesNum = 0;
@@ -73,12 +73,11 @@ public class BinomialHeap
     		this.first = newHeapNode;
     		this.last = newHeapNode;
     		this.min = newHeapNode;
+    		this.size = 1;
     	} else {
     		heapToMeld = new BinomialHeap(newHeapNode);
     		this.meld(heapToMeld);
     	}
-    	
-    	this.size++;
     }
 
    /**
@@ -89,8 +88,31 @@ public class BinomialHeap
     */
     public void deleteMin()
     {
-     	return; // should be replaced by student code
+    	// collect all min's children to new heap
+    	BinomialHeap h = new BinomialHeap();
+     	HeapNode p = this.min.getLeftMostChild();
      	
+     	while (p != null) {
+     		h.addTree(p);
+     		p = p.getNext();
+     	}
+     	
+     	// remove min from trees list
+     	if (this.min.getPrev() != null) {
+     		this.min.getPrev().setNext(this.min.getNext());
+     	}
+     	if (this.min.getNext() != null) {
+     		this.min.getNext().setPrev(this.min.getPrev());
+     	}
+     	if (this.min == this.first) {
+     		this.first = this.min.getNext();
+     	}
+     	if (this.min == this.last) {
+     		this.last = this.min.getPrev();
+     	}
+     	
+     	// meld everything together
+     	this.meld(h);
     }
 
    /**
@@ -112,89 +134,123 @@ public class BinomialHeap
     */
     public void meld (BinomialHeap heap2)
     {
-    	HeapNode result = new HeapNode(-1);
-    	HeapNode curr1 = this.getFirst();
-    	HeapNode curr2 = heap2.getFirst();
-    	HeapNode saved = null;
-    	HeapNode tmp;
-    	
-    	while(curr2 != null) {
-    		/*
-    		if(curr1.getRank() == curr2.getRank()) {
-    			if (saved != null) {
-    				if (saved.getRank() == curr1.getRank()) {
-    					result.setNext(saved);
-    					saved = null;
-    				}
-    			}
-    			curr1.linkWith(curr2);
-    			saved = curr1;
-    		} else if(curr1.getRank() > curr2.getRank()) {
-    			if (saved != null && saved.getRank() == curr2.getRank()) {
-    				curr2.linkWith(saved);
-    				saved = curr2;
-    			}
-    			result.setNext(curr2);
-    		} else {
-    			
-    		}
-    		*/
+    	BinomialHeap h = merge(this, heap2);
+    	if (h.empty()) {
+    		// this.empty(), so do nothing
+    	} else {
+    		HeapNode prevX = null;
+    		HeapNode x = h.getFirst();
+    		HeapNode nextX = x.getNext();
     		
-    		if (curr1.getRank() < curr2.getRank()) {
-    			if (saved != null) {
-    				if (saved.getRank() < curr1.getRank()) {
-    					result.setNext(saved);
-    					saved = null;
-    				} else { // curr1.getRank() == saved.getRank()
-    					//if (curr1.getValue() < saved)
-    				}
-    			}
-    			
-    			result.setNext(curr1);
-    			curr1 = curr1.getNext();
-    		} else if (curr2.getRank() < curr1.getRank()) {
-    			if (saved != null) {
-    				if (saved.getRank() < curr2.getRank()) {
-    					result.setNext(saved);
-    					saved = null;
-    				}
-    			}
-    			
-    			result.setNext(curr2);
-    			curr2 = curr2.getNext();
-    		} else { // ==
-    			
-    			if (curr1.getValue() < curr2.getValue()) {
-    				curr1.linkWith(curr2);
-    				saved = curr1;
+    		while (nextX != null) {
+    			if (x.getRank() != nextX.getRank() ||
+    					(nextX.getNext() != null && nextX.getNext().getRank() == x.getRank())) {
+    				prevX = x;
+    				x = nextX;
     			} else {
-    				curr2.linkWith(curr1);
-    				saved = curr2;
+    				if (x.getValue() <= nextX.getValue()) {
+    					x.setNext(nextX.getNext());
+    					x.linkWith(nextX);
+    				} else {
+    					if (prevX == null) {
+    						h.setFirst(nextX);
+    					} else {
+    						prevX.setNext(nextX);
+    					}
+    					nextX.linkWith(x);
+    					x = nextX;
+    				}
     			}
     			
-    			curr1 = curr1.getNext();
-    			curr2 = curr2.getNext();
+        		nextX = x.getNext();
+    		}
+    		
+    		this.first = h.first;
+    		this.last = h.last;
+    	}
+		
+		// fix size, trees count, min node
+		this.fixProperties();
+    }
+	
+	private void fixProperties() {
+		HeapNode p = this.first;
+		this.size = 0;
+		this.treesNum = 0;
+		this.min = null;
+		while (p != null) {
+			this.size+= p.getSize();
+			this.treesNum++;
+			if (this.min == null) {
+				this.min = p;
+			} else if (p.getValue() < this.min.getValue()) {
+				this.min = p;
+			}
+			p = p.getNext();
+		}
+		// fix trees size array
+		this.buildTreesSize();
+	}
+    
+    public static BinomialHeap merge(BinomialHeap heap1, BinomialHeap heap2) {
+    	BinomialHeap h = new BinomialHeap();
+    	
+    	HeapNode p1 = heap1.getFirst();
+    	HeapNode p2 = heap2.getFirst();
+    	
+    	while (p1 != null && p2 != null) {
+    		if (p1.getRank() <= p2.getRank()) {
+    			h.addTree(p1);
+    			p1 = p1.getNext();
+    		} else {
+    			h.addTree(p2);
+    			p2 = p2.getNext();
     		}
     	}
+    	
+    	while (p1 != null) {
+    		h.addTree(p1);
+    		p1 = p1.getNext();
+    	}
+    	while (p2 != null) {
+    		h.addTree(p2);
+    		p2 = p2.getNext();
+    	}
+    	
+    	return h;
     }
 
-   public HeapNode getFirst() {
+   private void addTree(HeapNode tree) {
+	   if (empty()) {
+		   this.first = tree;
+		   this.last = tree;
+	   } else {
+		   this.last.setNext(tree);
+		   this.last = tree;
+	   }
+	   
+	   this.size+= tree.getSize();
+	   
+	   //TODO after calling this, fix: min, size, treesNum, treesSize
+	}
+
+public HeapNode getFirst() {
 	return first;
-}
-
-public void setFirst(HeapNode first) {
-	this.first = first;
-}
-
-public HeapNode getLast() {
-	return last;
-}
-
-public void setLast(HeapNode last) {
-	this.last = last;
-}
-
-/**
+	}
+	
+	public void setFirst(HeapNode first) {
+		this.first = first;
+	}
+	
+	public HeapNode getLast() {
+		return last;
+	}
+	
+	public void setLast(HeapNode last) {
+		this.last = last;
+	}
+	
+	/**
     * public int size()
     *
     * Return the number of elements in the heap
@@ -242,7 +298,7 @@ public void setLast(HeapNode last) {
     	return false; // should be replaced by student code
     }
     
-    private void buildTreeSizes() {
+    private void buildTreesSize() {
     	this.treesSize = new int[this.treesNum];
     	HeapNode current = first;
     	int i = 0;
@@ -250,6 +306,22 @@ public void setLast(HeapNode last) {
     		this.treesSize[i++] = current.getSize();    		
     		current = current.getNext();
     	}
+    }
+    
+    @Override
+    public String toString() {
+    	StringBuffer str = new StringBuffer();
+    	
+    	HeapNode tree = this.getFirst();
+    	while (tree != null) {
+    		if (tree == this.min) {
+    			str.append('*');
+    		}
+    		str.append(tree.toString());
+    		tree = tree.getNext();
+    	}
+    	
+    	return String.format("{ %s }", str);
     }
     
    /**
@@ -275,6 +347,8 @@ public void setLast(HeapNode last) {
     	
 		public HeapNode(int value) {
     		this.value = value;
+    		this.size = 1;
+    		this.rank = 0;
     	}
     	
     	// Getters and Setters
@@ -335,6 +409,19 @@ public void setLast(HeapNode last) {
     		this.rank++;
     		this.size += other.size;
     	}
+        
+        @Override
+        public String toString() {
+        	StringBuffer children = new StringBuffer();;
+        	
+        	HeapNode child = this.getLeftMostChild();
+        	while (child != null) {
+        		children.append(child.toString());
+        		child = child.getNext();
+        	}
+        	
+        	return String.format("[ %d %s ]", this.getValue(), children);
+        }
     }
 
 }

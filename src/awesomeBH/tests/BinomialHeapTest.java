@@ -69,6 +69,7 @@ public class BinomialHeapTest {
 	}
 	
 	//TODO @Test public void meldTest1();
+	//TODO @Test public void treesSize1();
 	
 	@Test public void sizeTest1() {
 		BinomialHeap heap = new BinomialHeap();
@@ -84,9 +85,8 @@ public class BinomialHeapTest {
 	@Test public void sizeTest3() {
 		BinomialHeap heap = new BinomialHeap();
 		for (int size=1; size<=25; size++) {
-			for (int i=0; i<size; i++) {
-				assertEquals(size, heap.size());
-			}
+			heap.insert(size);
+			assertEquals(size, heap.size());
 		}
 	}
 	
