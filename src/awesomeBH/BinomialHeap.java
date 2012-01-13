@@ -134,7 +134,7 @@ public class BinomialHeap
     */
     public void meld (BinomialHeap heap2)
     {
-    	BinomialHeap h = merge(this, heap2);
+    	BinomialHeap h = BinomialHeap.merge(this, heap2);
     	if (h.empty()) {
     		// this.empty(), so do nothing
     	} else {
@@ -150,12 +150,18 @@ public class BinomialHeap
     			} else {
     				if (x.getValue() <= nextX.getValue()) {
     					x.setNext(nextX.getNext());
+    					if (nextX.getNext() != null) {
+    						nextX.getNext().setPrev(x);
+    					}
     					x.linkWith(nextX);
     				} else {
     					if (prevX == null) {
     						h.setFirst(nextX);
     					} else {
     						prevX.setNext(nextX);
+    						if (nextX != null) {
+    							nextX.setPrev(prevX);
+    						}
     					}
     					nextX.linkWith(x);
     					x = nextX;
@@ -226,6 +232,7 @@ public class BinomialHeap
 		   this.last = tree;
 	   } else {
 		   this.last.setNext(tree);
+		   tree.setPrev(this.last);
 		   this.last = tree;
 	   }
 	   
@@ -295,7 +302,22 @@ public HeapNode getFirst() {
     */
     public boolean isValid() 
     {
-    	return false; // should be replaced by student code
+    	//TODO validate no more than 1 rank per value
+    	//TODO validate minimum
+    	
+    	HeapNode p = this.first;
+    	int minVal = this.min.getValue();
+    	
+    	while (p != null) {
+    		if (!p.isValid()) {
+    			return false; // invalid binomial minimal tree
+    		}
+    		if (p.getValue() < minVal) {
+    			return false; // pointer 'min' is invalid
+    		}
+    		p = p.getNext();
+    	}
+    	return true;
     }
     
     private void buildTreesSize() {
@@ -392,7 +414,38 @@ public HeapNode getFirst() {
     	
     	// TODO
     	public boolean isValid() {
-    		return false;
+    		return validate() != null;
+    	}
+    	
+    	//TODO fix result type
+    	private int[] validate() {
+    		HeapNode child = this.getLeftMostChild();
+    		int[] childResult;
+    		int size = 1;
+    		int rank = 0;
+    		
+    		while (child != null) {
+    			if (this.getValue() > child.getValue()) {
+    				return null;
+    			}
+    			childResult = child.validate();
+    			if (childResult != null) {
+    				size+= childResult[0];
+    				rank++;
+    			} else {
+    				return null;
+    			}
+    			
+    			child = child.getNext();
+    		}
+    		
+    		if (size != Math.pow(2, rank)) {
+    			return null;
+    		}
+    		
+    		
+    		int[] result = { size, rank };
+    		return result;
     	}
     	
     	// TODO: whoever calls link needs to check the following assumptions:
@@ -402,7 +455,6 @@ public HeapNode getFirst() {
     		other.next = this.leftMostChild;
     		if(this.leftMostChild != null) {
     			this.leftMostChild.setPrev(other);
-    			
     		}
     		this.leftMostChild = other;
     		
