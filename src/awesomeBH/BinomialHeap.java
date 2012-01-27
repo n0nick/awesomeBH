@@ -4,6 +4,16 @@ package awesomeBH;
  * BinomialHeap
  * 
  * An implementation of binomial heap over non-negative integers.
+ * 
+ * Algorithms are based on:
+ * Cormen, Thomas H., Charles E. Leiserson, and
+ * Robert L. Rivest. Introduction to Algorithms.
+ * Cambridge, MA: MIT, 2001. Print.
+ * 
+ * Invariant: isValid()
+ * 
+ * @author Amir Moualem, amirmoua@mail.tau.ac.il, ID 300170800
+ * @author Sagie Maoz, sagiemao@mail.tau.ac.il, ID 021526025
  */
 public class BinomialHeap {
 	/**
