@@ -52,17 +52,55 @@ public class BinomialHeapTest {
 		
 		assertEquals(1, heap.size());
 		assertEquals(3, heap.findMin());
+		assertEquals(true, heap.isValid());
+		
+		heap.insert(7);
+		heap.insert(9);
+		heap.insert(1);
+		heap.insert(12);
+		heap.deleteMin();
+		assertEquals(true, heap.isValid());
 	}
 	
 	@Test public void deleteMinTest4() {
 		BinomialHeap heap = new BinomialHeap();
 		int[] array = { 7,2,5,14,1,30,12,19,24,7,2,5,14,1,30 }; 
 		heap.arrayToHeap(array);
+		assertEquals(true, heap.isValid());
 		assertEquals(1, heap.findMin());
+		
 		heap.deleteMin();
+		assertEquals(true, heap.isValid());
 		assertEquals(1, heap.findMin());
+		
 		heap.deleteMin();
+		assertEquals(true, heap.isValid());
 		assertEquals(2, heap.findMin());
+	}
+	
+	@Test public void deleteMinTest5() {
+		BinomialHeap heap = new BinomialHeap();
+		for (int i=0; i<50000; i+=50) {
+			heap.insert(i+1);
+		}
+		
+		for (int i=0; i<500; i++) {
+			heap.deleteMin();
+		}
+		
+		assertEquals(500, heap.size());
+	}
+	
+	@Test public void deleteMinTest6() {
+		int[] ar = {171, 48, 9, 112, 150, 199, 254, 263, 110, 172};
+		BinomialHeap heap = new BinomialHeap();
+		heap.arrayToHeap(ar);
+		
+		heap.deleteMin();
+		heap.deleteMin();
+		System.out.println(heap);
+		heap.deleteMin();
+		System.out.println(heap);
 	}
 	
 	@Test public void findMinTest1() {
@@ -119,7 +157,7 @@ public class BinomialHeapTest {
 		h2.insert(7);
 		h2.insert(49877221);
 		h2.insert(3);
-		
+
 		h1.meld(h2);
 		
 		assertEquals(true, h1.isValid());
@@ -208,7 +246,6 @@ public class BinomialHeapTest {
 		heap.arrayToHeap(array);
 
 		heap.getLast().setLeftmostChild(heap.getLast().getLeftmostChild().getNext());
-		
 		assertEquals(false, heap.isValid());
 	}
 	
@@ -239,7 +276,7 @@ public class BinomialHeapTest {
 		heap.arrayToHeap(array);
 		assertEquals(true, heap.isValid());
 		
-		heap.getLast().getLeftmostChild().getLeftmostChild().setLeftmostChild(null);
+		heap.getLast().getRightmostChild().getRightmostChild().setLeftmostChild(null);
 		assertEquals(false, heap.isValid());
 	}
 	

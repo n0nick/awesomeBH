@@ -145,9 +145,11 @@ public class BinomialHeap {
 		// collect all min's children to new heap
 		BinomialHeap h = new BinomialHeap();
 		HeapNode p = this.min.getLeftmostChild();
-		while (p != null) {
-			h.addTree(p);
-			p = p.getNext();
+		if (p != null) {
+			while (p != null) {
+				h.addTree(p);
+				p = p.getNext();
+			}
 		}
 
 		// remove min from trees list
@@ -164,7 +166,6 @@ public class BinomialHeap {
 			this.last = this.min.getPrev();
 		}
 
-		// meld everything together
 		this.meld(h);
 	}
 
@@ -240,24 +241,26 @@ public class BinomialHeap {
 
 			// copy the created heap trees to the trees list
 			this.first = h.first;
-			this.last = h.last;
 		}
 
-		// fix size, trees count, min node
+		// fix size, trees count, min node, last
 		this.fixProperties();
 	}
 
 	/**
-	 * Fixes the heap's properties: size, treesNum, min. This method should be
-	 * called after each call to meld(), to maintain the class's invariant.
+	 * Fixes the heap's properties: size, treesNum, min, last.
+	 * This method should be called after each call to meld(), to
+	 * maintain the class's invariant.
 	 * 
 	 * postcondition: this.isValid()
 	 */
 	private void fixProperties() {
 		HeapNode p = this.first;
+		HeapNode last = p;
 		this.size = 0;
 		this.treesNum = 0;
 		this.min = null;
+		
 		while (p != null) {
 			this.size += p.getSize();
 			this.treesNum++;
@@ -266,7 +269,20 @@ public class BinomialHeap {
 			} else if (p.getValue() < this.min.getValue()) {
 				this.min = p;
 			}
+			
+			last = p;
 			p = p.getNext();
+		}
+		
+		// fix last pointer
+		this.setLast(last);
+		
+		// fix list ends pointers
+		if (this.getLast() != null) {
+			this.getLast().setNext(null);
+		}
+		if (this.getFirst() != null) {
+			this.getFirst().setPrev(null);
 		}
 	}
 
@@ -287,8 +303,8 @@ public class BinomialHeap {
 
 		HeapNode p1 = heap1.getFirst();
 		HeapNode p2 = heap2.getFirst();
-
-		// concatenate two linked lists of binomial trees
+		
+		// merge-sort two linked lists of binomial trees
 		while (p1 != null && p2 != null) {
 			if (p1.getRank() <= p2.getRank()) {
 				h.addTree(p1);
@@ -502,6 +518,7 @@ public class BinomialHeap {
 				str.append('*'); // mark min tree
 			}
 			str.append(tree.toString());
+			str.append(", ");
 			tree = tree.getNext();
 		}
 
@@ -545,7 +562,12 @@ public class BinomialHeap {
 		/**
 		 * Pointer to leftmost child node
 		 */
-		private HeapNode leftMostChild;
+		private HeapNode leftmostChild;
+		
+		/**
+		 * Pointer to rightmost child node
+		 */
+		private HeapNode rightmostChild;
 
 		/**
 		 * Instantiates a new binomial node with a given value.
@@ -599,7 +621,7 @@ public class BinomialHeap {
 		 * @return Pointer to leftmost child node
 		 */
 		public HeapNode getLeftmostChild() {
-			return leftMostChild;
+			return leftmostChild;
 		}
 
 		/**
@@ -609,7 +631,24 @@ public class BinomialHeap {
 		 *            Pointer to new leftmost child node
 		 */
 		public void setLeftmostChild(HeapNode leftmostChild) {
-			this.leftMostChild = leftmostChild;
+			this.leftmostChild = leftmostChild;
+		}
+
+		/**
+		 * @return Pointer to rightmost child node
+		 */
+		public HeapNode getRightmostChild() {
+			return rightmostChild;
+		}
+
+		/**
+		 * Sets rightmost child node
+		 * 
+		 * @param rightmostChild
+		 *            Pointer to new rightmost child node
+		 */
+		public void setRightmostChild(HeapNode rightmostChild) {
+			this.rightmostChild = rightmostChild;
 		}
 
 		/**
@@ -692,17 +731,22 @@ public class BinomialHeap {
 		/**
 		 * Links the current node to another node;
 		 * 
-		 * precondition: other != null precondition: other.getValue() >
-		 * this.getValue() precondition: other.getRank() == this.getRank()
+		 * precondition: other != null
+		 * precondition: other.getValue() > this.getValue()
+		 * precondition: other.getRank() == this.getRank()
 		 * postcondition: this.getRank() = 1 + $prev(this.getRank())
-		 * postcondition: this.getLeftmostChild() == other
+		 * postcondition: this.getRightmostChild() == other
 		 */
 		public void linkWith(HeapNode other) {
-			other.next = this.leftMostChild;
-			if (this.leftMostChild != null) {
-				this.leftMostChild.setPrev(other);
+			other.setNext(null);
+			other.setPrev(this.rightmostChild);
+			if (this.rightmostChild != null) {
+				this.rightmostChild.setNext(other);
+			} else {
+				this.leftmostChild = other;
 			}
-			this.leftMostChild = other;
+			this.rightmostChild = other;
+			
 
 			this.rank++;
 			this.size += other.size;
