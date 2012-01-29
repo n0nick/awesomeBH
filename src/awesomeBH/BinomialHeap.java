@@ -455,6 +455,10 @@ public class BinomialHeap {
 			actualTreesCount++;
 			p = p.getNext();
 		}
+		
+		if (actualTreesCount != this.treesNum) {
+			return false; // invalid trees count
+		}
 
 		// validate binomial trees
 		int[] actualRanks = new int[actualTreesCount];

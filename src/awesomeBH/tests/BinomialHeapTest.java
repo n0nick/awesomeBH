@@ -98,9 +98,7 @@ public class BinomialHeapTest {
 		
 		heap.deleteMin();
 		heap.deleteMin();
-		System.out.println(heap);
 		heap.deleteMin();
-		System.out.println(heap);
 	}
 	
 	@Test public void findMinTest1() {

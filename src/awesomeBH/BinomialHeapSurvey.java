@@ -36,22 +36,20 @@ public class BinomialHeapSurvey {
 	public static void main(String[] args) {
 		int[] sizes = { 750 , 1500, 2250 };
 		int[] array;
-		int j;
 		BinomialHeap h = new BinomialHeap();
 
 		for (int size : sizes) {
 			array = generateRandomSet(size);
 			h.arrayToHeap(array);
 
-			System.out.format("For size %d:\n", size);
-			System.out.format("%s (%d)\n", Arrays.toString(h.treesSize()), h.size());
+			System.out.format("(i) After %d insert()s:\n", size);
+			System.out.format("%d trees: %s\n", h.treesSize().length, Arrays.toString(h.treesSize()));
 
-			for (j = 0; j < size/3; j++) {
-				h.deleteMin();
-			}
+			h.deleteMin();
 
-			System.out.format("After %d deleteMin()s:\n", j);
-			System.out.format("%s (%d)\n\n", Arrays.toString(h.treesSize()), h.size());
+			System.out.println("(ii) After 1 deleteMin():");
+			System.out.format("%d trees: %s\n", h.treesSize().length, Arrays.toString(h.treesSize()));
+			System.out.println();
 		}
 	}
 }
