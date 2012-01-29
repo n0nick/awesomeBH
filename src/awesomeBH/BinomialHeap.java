@@ -425,7 +425,7 @@ public class BinomialHeap {
 	/**
 	 * public void arrayToHeap()
 	 * 
-	 * Insert the array to the heap. Delete previous elemnts in the heap.
+	 * Insert the array to the heap. Delete previous elements in the heap.
 	 * 
 	 * Time complexity: O(array.length)
 	 */
@@ -614,7 +614,7 @@ public class BinomialHeap {
 		/**
 		 * Sets previous sibling node
 		 * 
-		 * @param next
+		 * @param prev
 		 *            Pointer to new previous sibling node
 		 */
 		public void setPrev(HeapNode prev) {
@@ -733,7 +733,7 @@ public class BinomialHeap {
 		}
 
 		/**
-		 * Links the current node to another node;
+		 * Links the current node to another node.
 		 * 
 		 * precondition: other != null
 		 * precondition: other.getValue() > this.getValue()
